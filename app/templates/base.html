@@ -1,0 +1,39 @@
+Set-Content -Path app/templates/base.html -Value '<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Task Scheduler</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f8f9fa; font-family: "Segoe UI", sans-serif; }
+        .sidebar { min-height: calc(100vh - 56px); background: #ffffff; border-right: 1px solid #dee2e6; }
+        .card-stat { border-radius: 10px; border: none; transition: transform 0.2s; }
+        .card-stat:hover { transform: translateY(-3px); }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="#"><i class="bi bi-calendar-check"></i> Employee Task Scheduler</a>
+            <span class="badge bg-light text-primary fw-bold">Sprint 1 - Milestone 1</span>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2 p-0 sidebar shadow-sm">
+                <div class="list-group list-group-flush mt-3">
+                    <a href="#" class="list-group-item list-group-item-action active"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
+                    <a href="#" class="list-group-item list-group-item-action"><i class="bi bi-people me-2"></i> Nhân viên</a>
+                    <a href="#" class="list-group-item list-group-item-action"><i class="bi bi-list-task me-2"></i> Công việc</a>
+                    <a href="#" class="list-group-item list-group-item-action"><i class="bi bi-info-circle me-2"></i> Giới thiệu</a>
+                </div>
+            </div>
+            <div class="col-md-10 p-4">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>'
