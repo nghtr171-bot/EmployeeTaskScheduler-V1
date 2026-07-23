@@ -1,9 +1,9 @@
-Set-Content -Path app/templates/dashboard/index.html -Value '{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h3 class="fw-bold text-dark">Tổng quan hệ thống</h3>
-    <button class="btn btn-primary"><i class="bi bi-plus-lg"></i> Thêm công việc mới</button>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTaskModal"><i class="bi bi-plus-lg"></i> Thêm công việc mới</button>
 </div>
 
 <div class="row g-3 mb-4">
@@ -43,6 +43,7 @@ Set-Content -Path app/templates/dashboard/index.html -Value '{% extends "base.ht
                     <th>Người thực hiện</th>
                     <th>Hạn hoàn thành</th>
                     <th>Trạng thái</th>
+                    <th>Hành động</th>
                 </tr>
             </thead>
             <tbody>
@@ -51,15 +52,45 @@ Set-Content -Path app/templates/dashboard/index.html -Value '{% extends "base.ht
                     <td>Nguyễn Văn A</td>
                     <td>23/07/2026</td>
                     <td><span class="badge bg-success">Hoàn thành</span></td>
+                    <td><button class="btn btn-sm btn-outline-primary" onclick="alert('Chi tiết: Khởi tạo thành công!')">Xem</button></td>
                 </tr>
                 <tr>
                     <td><strong>Thiết kế Database SQLite</strong></td>
                     <td>Trần Thị B</td>
                     <td>25/07/2026</td>
                     <td><span class="badge bg-warning text-dark">Đang làm</span></td>
+                    <td><button class="btn btn-sm btn-outline-primary" onclick="alert('Chi tiết: Đang thiết kế DB!')">Xem</button></td>
                 </tr>
             </tbody>
         </table>
     </div>
 </div>
-{% endblock %}'
+
+<div class="modal fade" id="addTaskModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Thêm công việc mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="event.preventDefault(); alert('Thêm công việc thành công!'); location.reload();">
+                    <div class="mb-3">
+                        <label class="form-label">Tên công việc</label>
+                        <input type="text" class="form-control" required placeholder="Nhập tên công việc...">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Người thực hiện</label>
+                        <input type="text" class="form-control" required placeholder="Nhập tên nhân viên...">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Hạn hoàn thành</label>
+                        <input type="date" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Lưu công việc</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
