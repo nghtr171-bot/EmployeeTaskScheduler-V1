@@ -225,10 +225,10 @@
         </div>
     </div>
 
-    <!-- SCRIPT TÍCH HỢP CLOUD API ĐỒNG BỘ 100% TẤT CẢ CÁC MÁY -->
+    <!-- SCRIPT TÍCH HỢP MOCKAPI CỦA BẠN (ĐỒNG BỘ 100% CÁC MÁY) -->
     <script>
-        const USERS_API = "https://669e4f509a310688093d56b0.mockapi.io/users";
-        const TASKS_API = "https://669e4f509a310688093d56b0.mockapi.io/tasks";
+        const USERS_API = "https://6a618eabda10c59c18099894.mockapi.io/users";
+        const TASKS_API = "https://6a618eabda10c59c18099894.mockapi.io/tasks";
         
         let currentUser = JSON.parse(localStorage.getItem('user_session')) || null;
         let onlineUsers = [];
@@ -285,7 +285,7 @@
             location.reload();
         }
 
-        // --- THÊM & SỬA NHÂN VIÊN (ĐỒNG BỘ MỌI MÁY) ---
+        // --- THÊM & SỬA NHÂN VIÊN ---
         async function handleSaveEmp(e) {
             e.preventDefault();
             const btn = document.getElementById('btnSaveEmp');
@@ -336,7 +336,7 @@
             }
         }
 
-        // --- CÔNG VIỆC (ĐỒNG BỘ MỌI MÁY) ---
+        // --- CÔNG VIỆC ---
         async function handleAddTask(e) {
             e.preventDefault();
             const btn = document.getElementById('btnSaveTask');
