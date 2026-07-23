@@ -1,98 +1,310 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Quản lý Công việc</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f8f9fa; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
+        .sidebar { min-height: calc(100vh - 56px); background: #ffffff; border-right: 1px solid #dee2e6; }
+        
+        /* Giao diện Đăng nhập */
+        #login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #e9ecef; }
+        .login-card { width: 100%; max-width: 400px; padding: 30px; border-radius: 12px; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        
+        /* Modal Popup */
+        #customModal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+        .modal-box { background: white; width: 450px; margin: 10% auto; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
 
-{% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="fw-bold text-dark">Tổng quan hệ thống</h3>
-    <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#addTaskModal">
-        <i class="bi bi-plus-lg"></i> Thêm công việc mới
-    </button>
-</div>
+    <!-- 1. MÀN HÌNH ĐĂNG NHẬP -->
+    <div id="login-screen">
+        <div class="login-card">
+            <h3 class="fw-bold text-center text-primary mb-2"><i class="bi bi-shield-lock"></i> Đăng Nhập</h3>
+            <p class="text-muted text-center small mb-4">Hệ thống Task Scheduler</p>
+            
+            <form onsubmit="handleLogin(event)">
+                <div class="mb-3">
+                    <label class="form-label font-weight-bold">Tài khoản</label>
+                    <input type="text" id="loginUsername" class="form-control" placeholder="Nhập admin hoặc nv01" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label font-weight-bold">Mật khẩu</label>
+                    <input type="password" id="loginPassword" class="form-control" placeholder="Mật khẩu (123456)" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 fw-bold py-2 mt-2">Đăng Nhập</button>
+            </form>
 
-<div class="row g-3 mb-4">
-    <div class="col-md-3">
-        <div class="card card-stat shadow-sm p-3 border-start border-primary border-4">
-            <div class="text-muted small">TỔNG NHÂN VIÊN</div>
-            <h2 class="fw-bold m-0 text-primary">12</h2>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card card-stat shadow-sm p-3 border-start border-success border-4">
-            <div class="text-muted small">CÔNG VIỆC HOÀN THÀNH</div>
-            <h2 class="fw-bold m-0 text-success">28</h2>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card card-stat shadow-sm p-3 border-start border-warning border-4">
-            <div class="text-muted small">ĐANG THỰC HIỆN</div>
-            <h2 class="fw-bold m-0 text-warning">8</h2>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card card-stat shadow-sm p-3 border-start border-danger border-4">
-            <div class="text-muted small">CÔNG VIỆC QUÁ HẠN</div>
-            <h2 class="fw-bold m-0 text-danger">2</h2>
-        </div>
-    </div>
-</div>
-
-<div class="card border-0 shadow-sm p-3">
-    <h5 class="fw-bold mb-3">Danh sách công việc gần đây</h5>
-    <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>Tên công việc</th>
-                    <th>Người thực hiện</th>
-                    <th>Hạn hoàn thành</th>
-                    <th>Trạng thái</th>
-                    <th>Hành động</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><strong>Khởi tạo dự án Flask</strong></td>
-                    <td>Nguyễn Văn A</td>
-                    <td>23/07/2026</td>
-                    <td><span class="badge bg-success">Hoàn thành</span></td>
-                    <td><button class="btn btn-sm btn-outline-primary" onclick="alert('Chi tiết: Khởi tạo thành công!')">Xem</button></td>
-                </tr>
-                <tr>
-                    <td><strong>Thiết kế Database SQLite</strong></td>
-                    <td>Trần Thị B</td>
-                    <td>25/07/2026</td>
-                    <td><span class="badge bg-warning text-dark">Đang làm</span></td>
-                    <td><button class="btn btn-sm btn-outline-primary" onclick="alert('Chi tiết: Đang thiết kế DB!')">Xem</button></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<div class="modal fade" id="addTaskModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">Thêm công việc mới</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form onsubmit="event.preventDefault(); alert('Thêm công việc thành công!'); location.reload();">
-                    <div class="mb-3">
-                        <label class="form-label">Tên công việc</label>
-                        <input type="text" class="form-control" required placeholder="Nhập tên công việc...">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Người thực hiện</label>
-                        <input type="text" class="form-control" required placeholder="Nhập tên nhân viên...">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Hạn hoàn thành</label>
-                        <input type="date" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">Lưu công việc</button>
-                </form>
+            <div class="mt-4 p-2 bg-light border rounded text-center small text-muted">
+                <strong>Tài khoản thử nghiệm:</strong><br>
+                • Quản lý: <code>admin</code> / <code>123456</code><br>
+                • Nhân viên: <code>nv01</code> / <code>123456</code>
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
+
+    <!-- 2. MÀN HÌNH CHÍNH ỨNG DỤNG -->
+    <div id="main-screen" style="display: none;">
+        <!-- Thanh điều hướng trên cùng -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold" href="#"><i class="bi bi-calendar-check"></i> Employee Task Scheduler</a>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-white fw-bold" id="user-info-display"></span>
+                    <button class="btn btn-sm btn-light text-danger fw-bold" onclick="handleLogout()"><i class="bi bi-box-arrow-right"></i> Đăng xuất</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid">
+            <div class="row">
+                <!-- SIDEBAR MENU -->
+                <div class="col-md-2 p-0 sidebar shadow-sm">
+                    <div class="list-group list-group-flush mt-3">
+                        <a href="javascript:void(0)" onclick="showPage('dashboard')" class="list-group-item list-group-item-action active" id="btn-dashboard"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
+                        <a href="javascript:void(0)" onclick="showPage('employees')" class="list-group-item list-group-item-action" id="btn-employees"><i class="bi bi-people me-2"></i> Nhân viên</a>
+                        <a href="javascript:void(0)" onclick="showPage('tasks')" class="list-group-item list-group-item-action" id="btn-tasks"><i class="bi bi-list-task me-2"></i> Công việc</a>
+                    </div>
+                </div>
+
+                <!-- MAIN CONTENT AREA -->
+                <div class="col-md-10 p-4">
+                    
+                    <!-- PAGE: DASHBOARD -->
+                    <div id="page-dashboard">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="fw-bold m-0">Tổng quan công việc</h3>
+                            <button class="btn btn-primary shadow-sm admin-only" onclick="openModal()"><i class="bi bi-plus-lg"></i> Thêm công việc mới</button>
+                        </div>
+
+                        <div class="card border-0 shadow-sm p-3">
+                            <h6 class="fw-bold mb-3 text-secondary">Danh sách công việc gần đây</h6>
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Tên công việc</th>
+                                        <th>Người thực hiện</th>
+                                        <th>Hạn hoàn thành</th>
+                                        <th>Trạng thái</th>
+                                        <th class="admin-only">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboard-task-list"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- PAGE: EMPLOYEES -->
+                    <div id="page-employees" style="display:none;">
+                        <h3 class="fw-bold mb-4">Danh sách Nhân sự</h3>
+                        <div class="card border-0 shadow-sm p-3">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr><th>Mã NV</th><th>Họ tên</th><th>Chức vụ</th><th>Quyền hệ thống</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>NV01</td><td>Nguyễn Quản Lý</td><td>Quản lý dự án</td><td><span class="badge bg-danger">Admin</span></td></tr>
+                                    <tr><td>NV02</td><td>Nguyễn Văn A</td><td>Lập trình viên Backend</td><td><span class="badge bg-secondary">Employee</span></td></tr>
+                                    <tr><td>NV03</td><td>Trần Thị B</td><td>Thiết kế UI/UX</td><td><span class="badge bg-secondary">Employee</span></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- PAGE: TASKS -->
+                    <div id="page-tasks" style="display:none;">
+                        <h3 class="fw-bold mb-4">Tất cả công việc trong dự án</h3>
+                        <div class="card border-0 shadow-sm p-3">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr><th>Tên công việc</th><th>Người thực hiện</th><th>Hạn chót</th><th>Trạng thái</th></tr>
+                                </thead>
+                                <tbody id="all-task-list"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. MODAL POPUP THÊM CÔNG VIỆC -->
+    <div id="customModal">
+        <div class="modal-box">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold m-0">Thêm công việc mới</h5>
+                <button type="button" class="btn-close" onclick="closeModal()"></button>
+            </div>
+            <form onsubmit="handleAddTask(event)">
+                <div class="mb-3">
+                    <label class="form-label">Tên công việc</label>
+                    <input type="text" id="taskTitle" class="form-control" required placeholder="VD: Lập trình chức năng Đăng nhập">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Người thực hiện</label>
+                    <input type="text" id="taskAssignee" class="form-control" required placeholder="VD: Nguyễn Văn A">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Hạn hoàn thành</label>
+                    <input type="date" id="taskDueDate" class="form-control" required>
+                </div>
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu công việc</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. LOGIC JAVASCRIPT KẾT NỐI MÁY CHỦ -->
+    <script>
+        const API_URL = "http://127.0.0.1:5000/api";
+        let currentUser = JSON.parse(localStorage.getItem('user_session')) || null;
+
+        window.onload = function() {
+            if (currentUser) {
+                renderApp();
+            }
+        };
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('loginUsername').value;
+            const p = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: u, password: p })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentUser = data.user;
+                    localStorage.setItem('user_session', JSON.stringify(currentUser));
+                    renderApp();
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                alert("Lỗi: Không thể kết nối tới API Flask!");
+            }
+        }
+
+        function renderApp() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-screen').style.display = 'block';
+            
+            const roleBadge = currentUser.role === 'admin' ? '<span class="badge bg-danger">Quản lý</span>' : '<span class="badge bg-secondary">Nhân viên</span>';
+            document.getElementById('user-info-display').innerHTML = `<i class="bi bi-person-circle"></i> ${currentUser.fullname} (${roleBadge})`;
+
+            const adminElements = document.querySelectorAll('.admin-only');
+            adminElements.forEach(el => {
+                el.style.display = (currentUser.role === 'admin') ? '' : 'none';
+            });
+
+            fetchTasks();
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('user_session');
+            location.reload();
+        }
+
+        async function fetchTasks() {
+            try {
+                const response = await fetch(`${API_URL}/tasks`);
+                const tasks = await response.json();
+
+                let dashboardRows = '';
+                let allRows = '';
+
+                tasks.forEach(t => {
+                    const badgeClass = t.status === 'Hoàn thành' ? 'bg-success' : 'bg-warning text-dark';
+                    
+                    const actionCol = currentUser.role === 'admin' 
+                        ? `<td><button class="btn btn-sm btn-outline-danger" onclick="deleteTask(${t.id})"><i class="bi bi-trash"></i> Xóa</button></td>` 
+                        : '';
+
+                    dashboardRows += `
+                        <tr>
+                            <td><strong>${t.title}</strong></td>
+                            <td>${t.assignee}</td>
+                            <td>${t.due_date}</td>
+                            <td><span class="badge ${badgeClass}">${t.status}</span></td>
+                            ${actionCol}
+                        </tr>
+                    `;
+
+                    allRows += `
+                        <tr>
+                            <td><strong>${t.title}</strong></td>
+                            <td>${t.assignee}</td>
+                            <td>${t.due_date}</td>
+                            <td><span class="badge ${badgeClass}">${t.status}</span></td>
+                        </tr>
+                    `;
+                });
+
+                document.getElementById('dashboard-task-list').innerHTML = dashboardRows;
+                document.getElementById('all-task-list').innerHTML = allRows;
+
+            } catch (error) {
+                console.error("Lỗi khi tải công việc:", error);
+            }
+        }
+
+        async function handleAddTask(e) {
+            e.preventDefault();
+            const title = document.getElementById('taskTitle').value;
+            const assignee = document.getElementById('taskAssignee').value;
+            const due_date = document.getElementById('taskDueDate').value;
+
+            try {
+                const response = await fetch(`${API_URL}/tasks`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, assignee, due_date })
+                });
+
+                const resData = await response.json();
+                if (resData.success) {
+                    closeModal();
+                    fetchTasks();
+                }
+            } catch (err) {
+                alert("Không thể thêm công việc!");
+            }
+        }
+
+        async function deleteTask(id) {
+            if (confirm("Bạn có chắc chắn muốn xóa công việc này khỏi hệ thống?")) {
+                try {
+                    await fetch(`${API_URL}/tasks/${id}`, { method: 'DELETE' });
+                    fetchTasks();
+                } catch (err) {
+                    alert("Lỗi khi xóa công việc!");
+                }
+            }
+        }
+
+        function showPage(pageId) {
+            ['dashboard', 'employees', 'tasks'].forEach(p => {
+                document.getElementById('page-' + p).style.display = (p === pageId) ? 'block' : 'none';
+                document.getElementById('btn-' + p).classList.remove('active');
+            });
+            document.getElementById('btn-' + pageId).classList.add('active');
+        }
+
+        function openModal() { document.getElementById('customModal').style.display = 'block'; }
+        function closeModal() { document.getElementById('customModal').style.display = 'none'; }
+    </script>
+</body>
+</html>
