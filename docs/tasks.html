@@ -10,7 +10,6 @@
         body { background-color: #f8f9fa; font-family: "Segoe UI", sans-serif; }
         .sidebar { min-height: calc(100vh - 56px); background: #ffffff; border-right: 1px solid #dee2e6; }
         .card-stat { border-radius: 10px; border: none; }
-        /* Style Modal tự chế bấm phát hiện ngay không lo lỗi JS CDN */
         #customModal {
             display: none; position: fixed; z-index: 9999; left: 0; top: 0;
             width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);
@@ -31,7 +30,7 @@
 
     <div class="container-fluid">
         <div class="row">
-            <!-- SIDEBAR MENU CLICK ĐƯỢC NGAY -->
+            <!-- SIDEBAR MENU -->
             <div class="col-md-2 p-0 sidebar shadow-sm">
                 <div class="list-group list-group-flush mt-3" id="sidebarMenu">
                     <a href="javascript:void(0)" onclick="showPage('dashboard')" class="list-group-item list-group-item-action active" id="btn-dashboard"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
@@ -41,10 +40,10 @@
                 </div>
             </div>
 
-            <!-- MAIN CONTENT AREA -->
+            <!-- MAIN CONTENT -->
             <div class="col-md-10 p-4">
                 
-                <!-- 1. DASHBOARD PAGE -->
+                <!-- 1. DASHBOARD -->
                 <div id="page-dashboard">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h3 class="fw-bold text-dark">Tổng quan hệ thống</h3>
@@ -53,9 +52,9 @@
 
                     <div class="row g-3 mb-4">
                         <div class="col-md-3"><div class="card card-stat shadow-sm p-3 border-start border-primary border-4"><div class="text-muted small">TỔNG NHÂN VIÊN</div><h2 class="fw-bold m-0 text-primary">12</h2></div></div>
-                        <div class="col-md-3"><div class="card card-stat shadow-sm p-3 border-start border-success border-4"><div class="text-muted small">CÔNG VIỆC HOÀN THÀNH</div><h2 class="fw-bold m-0 text-success">28</h2></div></div>
-                        <div class="col-md-3"><div class="card card-stat shadow-sm p-3 border-start border-warning border-4"><div class="text-muted small">ĐANG THỰC HIỆN</div><h2 class="fw-bold m-0 text-warning">8</h2></div></div>
-                        <div class="col-md-3"><div class="card card-stat shadow-sm p-3 border-start border-danger border-4"><div class="text-muted small">CÔNG VIỆC QUÁ HẠN</div><h2 class="fw-bold m-0 text-danger">2</h2></div></div>
+                        <div class="col-md-3"><div class="card card-stat shadow-sm p-3 border-start border-success border-4"><div class="text-muted small">CÔNG VIỆC HOÀN THÀNH</div><h2 class="fw-bold m-0 text-success" id="count-done">1</h2></div></div>
+                        <div class="col-md-3"><div class="card card-stat shadow-sm p-3 border-start border-warning border-4"><div class="text-muted small">ĐANG THỰC HIỆN</div><h2 class="fw-bold m-0 text-warning" id="count-doing">1</h2></div></div>
+                        <div class="col-md-3"><div class="card card-stat shadow-sm p-3 border-start border-danger border-4"><div class="text-muted small">CÔNG VIỆC QUÁ HẠN</div><h2 class="fw-bold m-0 text-danger">0</h2></div></div>
                     </div>
 
                     <div class="card border-0 shadow-sm p-3">
@@ -64,20 +63,19 @@
                             <thead class="table-light">
                                 <tr><th>Tên công việc</th><th>Người thực hiện</th><th>Hạn</th><th>Trạng thái</th><th>Hành động</th></tr>
                             </thead>
-                            <tbody>
-                                <tr><td><strong>Khởi tạo dự án Flask</strong></td><td>Nguyễn Văn A</td><td>23/07/2026</td><td><span class="badge bg-success">Hoàn thành</span></td><td><button class="btn btn-sm btn-outline-primary" onclick="alert('Đã hoàn thành!')">Xem</button></td></tr>
-                                <tr><td><strong>Thiết kế Database SQLite</strong></td><td>Trần Thị B</td><td>25/07/2026</td><td><span class="badge bg-warning text-dark">Đang làm</span></td><td><button class="btn btn-sm btn-outline-primary" onclick="alert('Đang thực hiện!')">Xem</button></td></tr>
+                            <tbody id="dashboard-task-list">
+                                <!-- Dữ liệu tự động đổ vào đây -->
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- 2. EMPLOYEES PAGE -->
+                <!-- 2. EMPLOYEES -->
                 <div id="page-employees" style="display:none;">
                     <h3 class="fw-bold mb-4">Quản lý Nhân viên</h3>
                     <div class="card border-0 shadow-sm p-3">
                         <table class="table table-hover">
-                            <thead><tr><th>ID</th><th>Họ tên</th><th>Chức vụ</th><th>Trạng thái</th></tr></thead>
+                            <thead class="table-light"><tr><th>ID</th><th>Họ tên</th><th>Chức vụ</th><th>Trạng thái</th></tr></thead>
                             <tbody>
                                 <tr><td>NV01</td><td>Nguyễn Văn A</td><td>Lập trình viên Backend</td><td><span class="badge bg-success">Đang làm việc</span></td></tr>
                                 <tr><td>NV02</td><td>Trần Thị B</td><td>Thiết kế UI/UX</td><td><span class="badge bg-success">Đang làm việc</span></td></tr>
@@ -86,15 +84,25 @@
                     </div>
                 </div>
 
-                <!-- 3. TASKS PAGE -->
+                <!-- 3. TASKS -->
                 <div id="page-tasks" style="display:none;">
-                    <h3 class="fw-bold mb-4">Danh sách Tất cả Công việc</h3>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="fw-bold">Danh sách Tất cả Công việc</h3>
+                        <button class="btn btn-primary shadow-sm" onclick="openModal()"><i class="bi bi-plus-lg"></i> Thêm công việc mới</button>
+                    </div>
                     <div class="card border-0 shadow-sm p-3">
-                        <p class="text-muted">Tất cả nhiệm vụ thuộc các Sprint đang được quản lý tại đây.</p>
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr><th>Tên công việc</th><th>Người thực hiện</th><th>Hạn</th><th>Trạng thái</th><th>Hành động</th></tr>
+                            </thead>
+                            <tbody id="all-task-list">
+                                <!-- Dữ liệu hiển thị ở đây -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                <!-- 4. ABOUT PAGE -->
+                <!-- 4. ABOUT -->
                 <div id="page-about" style="display:none;">
                     <h3 class="fw-bold mb-4">Giới thiệu Dự án</h3>
                     <div class="card border-0 shadow-sm p-4">
@@ -107,24 +115,97 @@
         </div>
     </div>
 
-    <!-- MODAL POPUP THÊM CÔNG VIỆC THUẦN JAVASCRIPT -->
+    <!-- MODAL POPUP THÊM CÔNG VIỆC -->
     <div id="customModal">
         <div class="modal-box">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-bold m-0">Thêm công việc mới</h5>
                 <button type="button" class="btn-close" onclick="closeModal()"></button>
             </div>
-            <form onsubmit="event.preventDefault(); alert('Thêm công việc thành công!'); closeModal();">
-                <div class="mb-3"><label class="form-label">Tên công việc</label><input type="text" class="form-control" required></div>
-                <div class="mb-3"><label class="form-label">Người thực hiện</label><input type="text" class="form-control" required></div>
-                <div class="mb-3"><label class="form-label">Hạn hoàn thành</label><input type="date" class="form-control" required></div>
+            <form id="addTaskForm" onsubmit="handleAddTask(event)">
+                <div class="mb-3">
+                    <label class="form-label">Tên công việc</label>
+                    <input type="text" id="inputTaskName" class="form-control" required placeholder="Nhập tên công việc...">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Người thực hiện</label>
+                    <input type="text" id="inputAssignee" class="form-control" required placeholder="Nhập tên người thực hiện...">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Hạn hoàn thành</label>
+                    <input type="date" id="inputDueDate" class="form-control" required>
+                </div>
                 <button type="submit" class="btn btn-primary w-100">Lưu công việc</button>
             </form>
         </div>
     </div>
 
     <script>
-        // JS chuyển trang mượt mà trực tiếp không lo bị kẹt URL
+        // Khởi tạo danh sách công việc mặc định
+        let initialTasks = [
+            { name: "Khởi tạo dự án Flask", assignee: "Nguyễn Văn A", dueDate: "2026-07-23", status: "Hoàn thành" },
+            { name: "Thiết kế Database SQLite", assignee: "Trần Thị B", dueDate: "2026-07-25", status: "Đang làm" }
+        ];
+
+        let tasks = JSON.parse(localStorage.getItem('tasksData')) || initialTasks;
+
+        function saveAndRender() {
+            localStorage.setItem('tasksData', JSON.stringify(tasks));
+            renderTasks();
+        }
+
+        function renderTasks() {
+            const dashboardBody = document.getElementById('dashboard-task-list');
+            const allTaskBody = document.getElementById('all-task-list');
+            
+            let htmlContent = '';
+            let doneCount = 0;
+            let doingCount = 0;
+
+            tasks.forEach((t, index) => {
+                if(t.status === 'Hoàn thành') doneCount++;
+                if(t.status === 'Đang làm') doingCount++;
+
+                const badgeClass = t.status === 'Hoàn thành' ? 'bg-success' : 'bg-warning text-dark';
+                htmlContent += `
+                    <tr>
+                        <td><strong>${t.name}</strong></td>
+                        <td>${t.assignee}</td>
+                        <td>${t.dueDate}</td>
+                        <td><span class="badge ${badgeClass}">${t.status}</span></td>
+                        <td><button class="btn btn-sm btn-outline-danger" onclick="deleteTask(${index})">Xóa</button></td>
+                    </tr>
+                `;
+            });
+
+            dashboardBody.innerHTML = htmlContent;
+            allTaskBody.innerHTML = htmlContent;
+
+            document.getElementById('count-done').innerText = doneCount;
+            document.getElementById('count-doing').innerText = doingCount;
+        }
+
+        function handleAddTask(e) {
+            e.preventDefault();
+            const name = document.getElementById('inputTaskName').value;
+            const assignee = document.getElementById('inputAssignee').value;
+            const dueDate = document.getElementById('inputDueDate').value;
+
+            tasks.push({ name, assignee, dueDate, status: "Đang làm" });
+            saveAndRender();
+            
+            document.getElementById('addTaskForm').reset();
+            closeModal();
+            alert('Thêm công việc thành công!');
+        }
+
+        function deleteTask(index) {
+            if(confirm('Bạn có chắc muốn xóa công việc này?')) {
+                tasks.splice(index, 1);
+                saveAndRender();
+            }
+        }
+
         function showPage(pageId) {
             ['dashboard', 'employees', 'tasks', 'about'].forEach(p => {
                 document.getElementById('page-' + p).style.display = (p === pageId) ? 'block' : 'none';
@@ -132,8 +213,12 @@
             });
             document.getElementById('btn-' + pageId).classList.add('active');
         }
+
         function openModal() { document.getElementById('customModal').style.display = 'block'; }
         function closeModal() { document.getElementById('customModal').style.display = 'none'; }
+
+        // Chạy khởi tạo khi tải trang
+        renderTasks();
     </script>
 </body>
 </html>
