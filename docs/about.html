@@ -88,7 +88,7 @@
                                     <tr>
                                         <th>Tên công việc</th>
                                         <th>Người thực hiện</th>
-                                        <th>Hạn chót</th>
+                                        <th>Hạn hoàn thành</th>
                                         <th>Trạng thái</th>
                                         <th class="admin-only">Hành động</th>
                                     </tr>
@@ -133,7 +133,7 @@
         </div>
     </div>
 
-    <!-- 3. MODAL POPUP THÊM CÔNG VIỆC (Dành riêng cho Admin) -->
+    <!-- 3. MODAL POPUP THÊM CÔNG VIỆC -->
     <div id="customModal">
         <div class="modal-box">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -161,19 +161,30 @@
         </div>
     </div>
 
-    <!-- 4. LOGIC JAVASCRIPT KẾT NỐI MÁY CHỦ -->
+    <!-- 4. LOGIC JAVASCRIPT KẾT NỐI MÁY CHỦ & MOCK DATA -->
     <script>
         const API_URL = "http://127.0.0.1:5000/api";
         let currentUser = JSON.parse(localStorage.getItem('user_session')) || null;
 
-        // Chạy khi tải trang
+        // Dữ liệu tài khoản giả lập cho GitHub Pages
+        const MOCK_USERS = {
+            'admin': { username: 'admin', fullname: 'Nguyễn Quản Lý', role: 'admin' },
+            'nv01': { username: 'nv01', fullname: 'Nguyễn Văn A', role: 'employee' }
+        };
+
+        // Dữ liệu công việc giả lập khởi tạo cho GitHub Pages
+        let localTasks = JSON.parse(localStorage.getItem('mock_tasks')) || [
+            { id: 1, title: 'Khởi tạo dự án Flask', assignee: 'Nguyễn Văn A', due_date: '2026-07-23', status: 'Hoàn thành' },
+            { id: 2, title: 'Thiết kế Database SQLite', assignee: 'Trần Thị B', due_date: '2026-07-25', status: 'Đang làm' }
+        ];
+
         window.onload = function() {
             if (currentUser) {
                 renderApp();
             }
         };
 
-        // Hàm Đăng nhập
+        // Xử lý Đăng nhập (Hỗ trợ cả API Flask lẫn GitHub Pages Demo)
         async function handleLogin(e) {
             e.preventDefault();
             const u = document.getElementById('loginUsername').value;
@@ -187,29 +198,34 @@
                 });
 
                 const data = await response.json();
-
                 if (data.success) {
                     currentUser = data.user;
                     localStorage.setItem('user_session', JSON.stringify(currentUser));
                     renderApp();
-                } else {
-                    alert(data.message);
+                    return;
                 }
             } catch (error) {
-                alert("Lỗi: Không thể kết nối tới Server Flask (http://127.0.0.1:5000)!");
+                // Tự động chuyển sang Chế độ Demo khi đẩy lên GitHub Pages
+                if (MOCK_USERS[u] && p === '123456') {
+                    currentUser = MOCK_USERS[u];
+                    localStorage.setItem('user_session', JSON.stringify(currentUser));
+                    renderApp();
+                    return;
+                } else {
+                    alert("Tài khoản hoặc mật khẩu không chính xác! (Nhập admin / 123456 hoặc nv01 / 123456)");
+                    return;
+                }
             }
         }
 
-        // Hiển thị ứng dụng sau khi đăng nhập thành công
         function renderApp() {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('main-screen').style.display = 'block';
             
-            // Hiện tên & vai trò
             const roleBadge = currentUser.role === 'admin' ? '<span class="badge bg-danger">Quản lý</span>' : '<span class="badge bg-secondary">Nhân viên</span>';
             document.getElementById('user-info-display').innerHTML = `<i class="bi bi-person-circle"></i> ${currentUser.fullname} (${roleBadge})`;
 
-            // Phân quyền giao diện: Nếu là Nhân viên -> Ẩn các nút Chỉnh sửa / Thêm / Xóa
+            // Phân quyền: Ẩn nút Thêm/Xóa nếu là Nhân viên
             const adminElements = document.querySelectorAll('.admin-only');
             adminElements.forEach(el => {
                 el.style.display = (currentUser.role === 'admin') ? '' : 'none';
@@ -218,55 +234,56 @@
             fetchTasks();
         }
 
-        // Đăng xuất
         function handleLogout() {
             localStorage.removeItem('user_session');
             location.reload();
         }
 
-        // Lấy danh sách Công việc từ máy chủ
+        // Lấy danh sách công việc
         async function fetchTasks() {
+            let tasks = localTasks;
+
             try {
                 const response = await fetch(`${API_URL}/tasks`);
-                const tasks = await response.json();
-
-                let dashboardRows = '';
-                let allRows = '';
-
-                tasks.forEach(t => {
-                    const badgeClass = t.status === 'Hoàn thành' ? 'bg-success' : 'bg-warning text-dark';
-                    
-                    // Cột hành động chỉ hiện khi là Admin
-                    const actionCol = currentUser.role === 'admin' 
-                        ? `<td><button class="btn btn-sm btn-outline-danger" onclick="deleteTask(${t.id})"><i class="bi bi-trash"></i> Xóa</button></td>` 
-                        : '';
-
-                    dashboardRows += `
-                        <tr>
-                            <td><strong>${t.title}</strong></td>
-                            <td>${t.assignee}</td>
-                            <td>${t.due_date}</td>
-                            <td><span class="badge ${badgeClass}">${t.status}</span></td>
-                            ${actionCol}
-                        </tr>
-                    `;
-
-                    allRows += `
-                        <tr>
-                            <td><strong>${t.title}</strong></td>
-                            <td>${t.assignee}</td>
-                            <td>${t.due_date}</td>
-                            <td><span class="badge ${badgeClass}">${t.status}</span></td>
-                        </tr>
-                    `;
-                });
-
-                document.getElementById('dashboard-task-list').innerHTML = dashboardRows;
-                document.getElementById('all-task-list').innerHTML = allRows;
-
+                if (response.ok) {
+                    tasks = await response.json();
+                }
             } catch (error) {
-                console.error("Lỗi khi tải công việc:", error);
+                console.log("Đang chạy trên GitHub Pages (Mock Mode)");
             }
+
+            let dashboardRows = '';
+            let allRows = '';
+
+            tasks.forEach(t => {
+                const badgeClass = t.status === 'Hoàn thành' ? 'bg-success' : 'bg-warning text-dark';
+                
+                const actionCol = currentUser.role === 'admin' 
+                    ? `<td><button class="btn btn-sm btn-outline-danger" onclick="deleteTask(${t.id})"><i class="bi bi-trash"></i> Xóa</button></td>` 
+                    : '';
+
+                dashboardRows += `
+                    <tr>
+                        <td><strong>${t.title}</strong></td>
+                        <td>${t.assignee}</td>
+                        <td>${t.due_date}</td>
+                        <td><span class="badge ${badgeClass}">${t.status}</span></td>
+                        ${actionCol}
+                    </tr>
+                `;
+
+                allRows += `
+                    <tr>
+                        <td><strong>${t.title}</strong></td>
+                        <td>${t.assignee}</td>
+                        <td>${t.due_date}</td>
+                        <td><span class="badge ${badgeClass}">${t.status}</span></td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('dashboard-task-list').innerHTML = dashboardRows;
+            document.getElementById('all-task-list').innerHTML = allRows;
         }
 
         // Thêm công việc mới
@@ -286,10 +303,21 @@
                 const resData = await response.json();
                 if (resData.success) {
                     closeModal();
-                    fetchTasks(); // Load lại dữ liệu mới nhất từ DB
+                    fetchTasks();
+                    return;
                 }
             } catch (err) {
-                alert("Không thể thêm công việc!");
+                // Lưu tạm vào LocalStorage nếu chạy trên GitHub Pages
+                localTasks.unshift({
+                    id: Date.now(),
+                    title,
+                    assignee,
+                    due_date,
+                    status: 'Đang làm'
+                });
+                localStorage.setItem('mock_tasks', JSON.stringify(localTasks));
+                closeModal();
+                fetchTasks();
             }
         }
 
@@ -298,14 +326,14 @@
             if (confirm("Bạn có chắc chắn muốn xóa công việc này khỏi hệ thống?")) {
                 try {
                     await fetch(`${API_URL}/tasks/${id}`, { method: 'DELETE' });
-                    fetchTasks(); // Load lại danh sách
                 } catch (err) {
-                    alert("Lỗi khi xóa công việc!");
+                    localTasks = localTasks.filter(t => t.id !== id);
+                    localStorage.setItem('mock_tasks', JSON.stringify(localTasks));
                 }
+                fetchTasks();
             }
         }
 
-        // Chuyển trang
         function showPage(pageId) {
             ['dashboard', 'employees', 'tasks'].forEach(p => {
                 document.getElementById('page-' + p).style.display = (p === pageId) ? 'block' : 'none';
