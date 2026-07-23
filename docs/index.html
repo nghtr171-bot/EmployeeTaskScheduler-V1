@@ -9,10 +9,8 @@
     <style>
         body { background-color: #f8f9fa; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
         .sidebar { min-height: calc(100vh - 56px); background: #ffffff; border-right: 1px solid #dee2e6; }
-        
         #login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #e9ecef; }
-        .login-card { width: 100%; max-width: 400px; padding: 30px; border-radius: 12px; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        
+        .login-card { width: 100%; max-width: 420px; padding: 30px; border-radius: 12px; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         .custom-modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
         .modal-box { background: white; width: 480px; margin: 8% auto; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
     </style>
@@ -23,7 +21,7 @@
     <div id="login-screen">
         <div class="login-card">
             <h3 class="fw-bold text-center text-primary mb-2"><i class="bi bi-shield-lock"></i> Đăng Nhập</h3>
-            <p class="text-muted text-center small mb-4">Hệ thống Task Scheduler</p>
+            <p class="text-muted text-center small mb-4">Hệ thống Task Scheduler (Online Sync)</p>
             
             <form onsubmit="handleLogin(event)">
                 <div class="mb-3">
@@ -34,13 +32,12 @@
                     <label class="form-label font-weight-bold">Mật khẩu</label>
                     <input type="password" id="loginPassword" class="form-control" placeholder="Nhập mật khẩu" required>
                 </div>
-                <button type="submit" class="btn btn-primary w-100 fw-bold py-2 mt-2">Đăng Nhập</button>
+                <button type="submit" id="btnLogin" class="btn btn-primary w-100 fw-bold py-2 mt-2">Đăng Nhập</button>
             </form>
 
-            <div class="mt-4 p-2 bg-light border rounded text-center small text-muted">
-                <strong>Tài khoản mặc định:</strong><br>
-                • Quản lý: <code>admin</code> / <code>123456</code><br>
-                • Nhân viên: <code>nv01</code> / <code>123456</code>
+            <div class="mt-4 p-3 bg-light border rounded text-start small text-muted">
+                <i class="bi bi-cloud-check text-success"></i> <strong>Đồng bộ Cloud Realtime:</strong><br>
+                Tài khoản & Công việc được lưu tập trung trên Cloud. Mọi máy tính/điện thoại đều xem và cập nhật chung 1 dữ liệu!
             </div>
         </div>
     </div>
@@ -99,7 +96,7 @@
                     <!-- PAGE: EMPLOYEES -->
                     <div id="page-employees" style="display:none;">
                         <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h3 class="fw-bold m-0">Danh sách Nhân sự</h3>
+                            <h3 class="fw-bold m-0">Danh sách Nhân sự (Đồng bộ Cloud)</h3>
                             <button class="btn btn-success shadow-sm admin-only" onclick="openAddEmpModal()"><i class="bi bi-person-plus"></i> Thêm nhân viên mới</button>
                         </div>
                         <div class="card border-0 shadow-sm p-3">
@@ -136,7 +133,7 @@
         </div>
     </div>
 
-    <!-- 3. MODAL POPUP THÊM CÔNG VIỆC -->
+    <!-- MODAL THÊM CÔNG VIỆC -->
     <div id="modalTask" class="custom-modal">
         <div class="modal-box">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -158,13 +155,13 @@
                 </div>
                 <div class="d-flex justify-content-end gap-2 mt-4">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('modalTask')">Hủy</button>
-                    <button type="submit" class="btn btn-primary">Lưu công việc</button>
+                    <button type="submit" id="btnSaveTask" class="btn btn-primary">Lưu công việc</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- 4. MODAL THÊM / SỬA NHÂN VIÊN -->
+    <!-- MODAL THÊM / SỬA NHÂN VIÊN -->
     <div id="modalEmp" class="custom-modal">
         <div class="modal-box">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -172,22 +169,22 @@
                 <button type="button" class="btn-close" onclick="closeModal('modalEmp')"></button>
             </div>
             <form onsubmit="handleSaveEmp(event)">
-                <input type="hidden" id="empEditOldUsername">
+                <input type="hidden" id="empEditId">
                 <div class="mb-3">
                     <label class="form-label">Tài khoản đăng nhập</label>
-                    <input type="text" id="empUsername" class="form-control" required placeholder="VD: nv02">
+                    <input type="text" id="empUsername" class="form-control" required placeholder="VD: nv03">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Mật khẩu</label>
-                    <input type="password" id="empPassword" class="form-control" placeholder="Nhập mật khẩu (Mặc định: 123456)">
+                    <input type="password" id="empPassword" class="form-control" placeholder="Mật khẩu (Mặc định: 123456)">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Họ và tên</label>
-                    <input type="text" id="empFullname" class="form-control" required placeholder="VD: Trần Văn B">
+                    <input type="text" id="empFullname" class="form-control" required placeholder="VD: Nguyễn Văn C">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Chức vụ</label>
-                    <input type="text" id="empPosition" class="form-control" required placeholder="VD: Lập trình viên Backend">
+                    <input type="text" id="empPosition" class="form-control" required placeholder="VD: Lập trình viên Frontend">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Quyền hệ thống</label>
@@ -198,13 +195,13 @@
                 </div>
                 <div class="d-flex justify-content-end gap-2 mt-4">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('modalEmp')">Hủy</button>
-                    <button type="submit" class="btn btn-success">Lưu thông tin</button>
+                    <button type="submit" id="btnSaveEmp" class="btn btn-success">Lưu lên Server</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- 5. MODAL ĐỔI MẬT KHẨU CÁ NHÂN -->
+    <!-- MODAL ĐỔI MẬT KHẨU CÁ NHÂN -->
     <div id="modalPassword" class="custom-modal">
         <div class="modal-box">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -222,50 +219,65 @@
                 </div>
                 <div class="d-flex justify-content-end gap-2 mt-4">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('modalPassword')">Hủy</button>
-                    <button type="submit" class="btn btn-primary">Đổi mật khẩu</button>
+                    <button type="submit" id="btnChangePass" class="btn btn-primary">Cập nhật mật khẩu</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- 6. LOGIC JAVASCRIPT -->
+    <!-- SCRIPT TÍCH HỢP CLOUD API ĐỒNG BỘ 100% TẤT CẢ CÁC MÁY -->
     <script>
+        const USERS_API = "https://669e4f509a310688093d56b0.mockapi.io/users";
+        const TASKS_API = "https://669e4f509a310688093d56b0.mockapi.io/tasks";
+        
         let currentUser = JSON.parse(localStorage.getItem('user_session')) || null;
+        let onlineUsers = [];
+        let onlineTasks = [];
 
-        // Khởi tạo danh sách nhân viên mặc định nếu chưa có
-        let localUsers = JSON.parse(localStorage.getItem('app_users')) || {
-            'admin': { username: 'admin', password: '123456', fullname: 'Nguyễn Quản Lý', position: 'Quản lý dự án', role: 'admin' },
-            'nv01': { username: 'nv01', password: '123456', fullname: 'Nguyễn Văn A', position: 'Lập trình viên Backend', role: 'employee' },
-            'hoai': { username: 'hoai', password: '123456', fullname: 'Châu Thái Hoài', position: 'Trưởng nhóm kỹ thuật', role: 'employee' }
-        };
-
-        // Danh sách công việc
-        let localTasks = JSON.parse(localStorage.getItem('mock_tasks')) || [
-            { id: 1, title: 'Lập trình chức năng', assignee: 'Châu Thái Hoài', due_date: '2026-07-25', status: 'Đang làm' },
-            { id: 2, title: 'Khởi tạo dự án Flask', assignee: 'Nguyễn Văn A', due_date: '2026-07-23', status: 'Hoàn thành' },
-            { id: 3, title: 'Thiết kế Database SQLite', assignee: 'Trần Thị B', due_date: '2026-07-25', status: 'Đang làm' }
-        ];
-
-        window.onload = function() {
-            localStorage.setItem('app_users', JSON.stringify(localUsers));
+        window.onload = async function() {
+            await fetchAllData();
             if (currentUser) {
                 renderApp();
             }
         };
 
-        // --- ĐĂNG NHẬP / ĐĂNG XUẤT ---
-        function handleLogin(e) {
+        async function fetchAllData() {
+            try {
+                const [resUsers, resTasks] = await Promise.all([fetch(USERS_API), fetch(TASKS_API)]);
+                if (resUsers.ok) onlineUsers = await resUsers.json();
+                if (resTasks.ok) onlineTasks = await resTasks.json();
+            } catch (err) {
+                console.error("Lỗi tải dữ liệu Cloud:", err);
+            }
+        }
+
+        // --- ĐĂNG NHẬP ---
+        async function handleLogin(e) {
             e.preventDefault();
+            const btn = document.getElementById('btnLogin');
+            btn.innerHTML = "Đang kiểm tra Cloud...";
+            btn.disabled = true;
+
             const u = document.getElementById('loginUsername').value.trim();
             const p = document.getElementById('loginPassword').value.trim();
 
-            if (localUsers[u] && localUsers[u].password === p) {
-                currentUser = localUsers[u];
+            await fetchAllData();
+
+            if (u === 'admin' && p === '123456') {
+                currentUser = { id: 'admin_root', username: 'admin', password: '123456', fullname: 'Nguyễn Quản Lý', role: 'admin' };
+            } else {
+                currentUser = onlineUsers.find(user => user.username === u && user.password === p);
+            }
+
+            if (currentUser) {
                 localStorage.setItem('user_session', JSON.stringify(currentUser));
                 renderApp();
             } else {
                 alert("Tài khoản hoặc mật khẩu không chính xác!");
             }
+
+            btn.innerHTML = "Đăng Nhập";
+            btn.disabled = false;
         }
 
         function handleLogout() {
@@ -273,30 +285,127 @@
             location.reload();
         }
 
-        // --- ĐỔI MẬT KHẨU CÁ NHÂN ---
-        function handleChangePassword(e) {
+        // --- THÊM & SỬA NHÂN VIÊN (ĐỒNG BỘ MỌI MÁY) ---
+        async function handleSaveEmp(e) {
             e.preventDefault();
+            const btn = document.getElementById('btnSaveEmp');
+            btn.innerHTML = "Đang lưu...";
+            btn.disabled = true;
+
+            const empId = document.getElementById('empEditId').value;
+            const uname = document.getElementById('empUsername').value.trim();
+            const pass = document.getElementById('empPassword').value.trim() || "123456";
+            const fname = document.getElementById('empFullname').value.trim();
+            const pos = document.getElementById('empPosition').value.trim();
+            const role = document.getElementById('empRole').value;
+
+            const payload = { username: uname, password: pass, fullname: fname, position: pos, role: role };
+
+            try {
+                if (empId) {
+                    await fetch(`${USERS_API}/${empId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                } else {
+                    await fetch(USERS_API, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                }
+
+                alert("Lưu thành công! Tài khoản này hiện có thể dùng trên TẤT CẢ các máy khác.");
+                closeModal('modalEmp');
+                await fetchAllData();
+                renderEmployees();
+            } catch (error) {
+                alert("Lỗi kết nối Server: " + error);
+            }
+
+            btn.innerHTML = "Lưu lên Server";
+            btn.disabled = false;
+        }
+
+        async function deleteEmp(id) {
+            if (confirm("Xóa nhân viên này khỏi hệ thống chung?")) {
+                await fetch(`${USERS_API}/${id}`, { method: 'DELETE' });
+                await fetchAllData();
+                renderEmployees();
+            }
+        }
+
+        // --- CÔNG VIỆC (ĐỒNG BỘ MỌI MÁY) ---
+        async function handleAddTask(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSaveTask');
+            btn.innerHTML = "Đang lưu...";
+            btn.disabled = true;
+
+            const title = document.getElementById('taskTitle').value;
+            const assignee = document.getElementById('taskAssignee').value;
+            const due_date = document.getElementById('taskDueDate').value;
+
+            try {
+                await fetch(TASKS_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, assignee, due_date, status: 'Đang làm' })
+                });
+                closeModal('modalTask');
+                await fetchAllData();
+                fetchTasks();
+            } catch (err) {
+                alert("Lỗi khi thêm công việc: " + err);
+            }
+
+            btn.innerHTML = "Lưu công việc";
+            btn.disabled = false;
+        }
+
+        async function deleteTask(id) {
+            if (confirm("Xóa công việc này khỏi hệ thống chung?")) {
+                await fetch(`${TASKS_API}/${id}`, { method: 'DELETE' });
+                await fetchAllData();
+                fetchTasks();
+            }
+        }
+
+        // --- ĐỔI MẬT KHẨU ---
+        async function handleChangePassword(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnChangePass');
             const oldP = document.getElementById('oldPass').value;
             const newP = document.getElementById('newPass').value;
 
-            if (currentUser.password !== oldP) {
+            if (currentUser.password && currentUser.password !== oldP) {
                 alert("Mật khẩu hiện tại không đúng!");
                 return;
             }
 
-            currentUser.password = newP;
-            localUsers[currentUser.username].password = newP;
-            
-            localStorage.setItem('user_session', JSON.stringify(currentUser));
-            localStorage.setItem('app_users', JSON.stringify(localUsers));
-            
-            alert("Đổi mật khẩu thành công!");
-            closeModal('modalPassword');
-            document.getElementById('oldPass').value = '';
-            document.getElementById('newPass').value = '';
+            btn.innerHTML = "Đang đổi...";
+            btn.disabled = true;
+
+            if (currentUser.id && currentUser.id !== 'admin_root') {
+                currentUser.password = newP;
+                await fetch(`${USERS_API}/${currentUser.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: newP })
+                });
+                localStorage.setItem('user_session', JSON.stringify(currentUser));
+                alert("Đổi mật khẩu thành công!");
+                closeModal('modalPassword');
+            } else {
+                alert("Tài khoản Root Admin không thể sửa qua Cloud!");
+            }
+
+            btn.innerHTML = "Cập nhật mật khẩu";
+            btn.disabled = false;
         }
 
-        // --- HIỂN THỊ HỆ THỐNG ---
+        // --- RENDER GIAO DIỆN ---
         function renderApp() {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('main-screen').style.display = 'block';
@@ -304,7 +413,6 @@
             const roleBadge = currentUser.role === 'admin' ? '<span class="badge bg-danger">Quản lý</span>' : '<span class="badge bg-secondary">Nhân viên</span>';
             document.getElementById('user-info-display').innerHTML = `<i class="bi bi-person-circle"></i> ${currentUser.fullname} (${roleBadge})`;
 
-            // Phân quyền Admin
             const adminElements = document.querySelectorAll('.admin-only');
             adminElements.forEach(el => {
                 el.style.display = (currentUser.role === 'admin') ? '' : 'none';
@@ -314,18 +422,17 @@
             renderEmployees();
         }
 
-        // --- QUẢN LÝ NHÂN VIÊN (Dành cho Admin) ---
         function renderEmployees() {
             let empRows = '';
             let assigneeOptions = '';
 
-            Object.values(localUsers).forEach(u => {
+            onlineUsers.forEach(u => {
                 const roleBadge = u.role === 'admin' ? '<span class="badge bg-danger">Admin</span>' : '<span class="badge bg-secondary">Employee</span>';
                 
                 const actionCol = currentUser.role === 'admin' 
                     ? `<td>
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick="openEditEmpModal('${u.username}')"><i class="bi bi-pencil"></i> Sửa</button>
-                        ${u.username !== 'admin' ? `<button class="btn btn-sm btn-outline-danger" onclick="deleteEmp('${u.username}')"><i class="bi bi-trash"></i> Xóa</button>` : ''}
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="openEditEmpModal('${u.id}')"><i class="bi bi-pencil"></i> Sửa</button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteEmp('${u.id}')"><i class="bi bi-trash"></i> Xóa</button>
                        </td>` 
                     : '';
 
@@ -333,7 +440,7 @@
                     <tr>
                         <td><strong>${u.username}</strong></td>
                         <td>${u.fullname}</td>
-                        <td>${u.position}</td>
+                        <td>${u.position || 'Nhân viên'}</td>
                         <td>${roleBadge}</td>
                         ${actionCol}
                     </tr>
@@ -347,8 +454,8 @@
         }
 
         function openAddEmpModal() {
-            document.getElementById('empModalTitle').innerText = "Thêm nhân viên mới";
-            document.getElementById('empEditOldUsername').value = "";
+            document.getElementById('empModalTitle').innerText = "Thêm nhân viên mới lên Cloud";
+            document.getElementById('empEditId').value = "";
             document.getElementById('empUsername').value = "";
             document.getElementById('empUsername').disabled = false;
             document.getElementById('empPassword').value = "123456";
@@ -358,12 +465,12 @@
             openModal('modalEmp');
         }
 
-        function openEditEmpModal(uname) {
-            const u = localUsers[uname];
+        function openEditEmpModal(id) {
+            const u = onlineUsers.find(item => item.id == id);
             document.getElementById('empModalTitle').innerText = "Chỉnh sửa thông tin nhân viên";
-            document.getElementById('empEditOldUsername').value = uname;
+            document.getElementById('empEditId').value = u.id;
             document.getElementById('empUsername').value = u.username;
-            document.getElementById('empUsername').disabled = true; // Không đổi username
+            document.getElementById('empUsername').disabled = true;
             document.getElementById('empPassword').value = u.password;
             document.getElementById('empFullname').value = u.fullname;
             document.getElementById('empPosition').value = u.position;
@@ -371,57 +478,14 @@
             openModal('modalEmp');
         }
 
-        function handleSaveEmp(e) {
-            e.preventDefault();
-            const oldUname = document.getElementById('empEditOldUsername').value;
-            const uname = document.getElementById('empUsername').value.trim();
-            const pass = document.getElementById('empPassword').value.trim() || "123456";
-            const fname = document.getElementById('empFullname').value.trim();
-            const pos = document.getElementById('empPosition').value.trim();
-            const role = document.getElementById('empRole').value;
-
-            if (!oldUname && localUsers[uname]) {
-                alert("Tài khoản này đã tồn tại!");
-                return;
-            }
-
-            localUsers[uname] = {
-                username: uname,
-                password: pass,
-                fullname: fname,
-                position: pos,
-                role: role
-            };
-
-            // Nếu đang tự chỉnh sửa bản thân
-            if (currentUser.username === uname) {
-                currentUser = localUsers[uname];
-                localStorage.setItem('user_session', JSON.stringify(currentUser));
-            }
-
-            localStorage.setItem('app_users', JSON.stringify(localUsers));
-            closeModal('modalEmp');
-            renderApp();
-            alert("Đã lưu thông tin nhân viên!");
-        }
-
-        function deleteEmp(uname) {
-            if (confirm(`Bạn có chắc chắn muốn xóa nhân viên ${uname}?`)) {
-                delete localUsers[uname];
-                localStorage.setItem('app_users', JSON.stringify(localUsers));
-                renderApp();
-            }
-        }
-
-        // --- QUẢN LÝ CÔNG VIỆC ---
         function fetchTasks() {
             let dashboardRows = '';
             let allRows = '';
 
-            localTasks.forEach(t => {
+            onlineTasks.forEach(t => {
                 const badgeClass = t.status === 'Hoàn thành' ? 'bg-success' : 'bg-warning text-dark';
                 const actionCol = currentUser.role === 'admin' 
-                    ? `<td><button class="btn btn-sm btn-outline-danger" onclick="deleteTask(${t.id})"><i class="bi bi-trash"></i> Xóa</button></td>` 
+                    ? `<td><button class="btn btn-sm btn-outline-danger" onclick="deleteTask('${t.id}')"><i class="bi bi-trash"></i> Xóa</button></td>` 
                     : '';
 
                 dashboardRows += `
@@ -448,27 +512,6 @@
             document.getElementById('all-task-list').innerHTML = allRows;
         }
 
-        function handleAddTask(e) {
-            e.preventDefault();
-            const title = document.getElementById('taskTitle').value;
-            const assignee = document.getElementById('taskAssignee').value;
-            const due_date = document.getElementById('taskDueDate').value;
-
-            localTasks.unshift({ id: Date.now(), title, assignee, due_date, status: 'Đang làm' });
-            localStorage.setItem('mock_tasks', JSON.stringify(localTasks));
-            closeModal('modalTask');
-            fetchTasks();
-        }
-
-        function deleteTask(id) {
-            if (confirm("Xóa công việc này?")) {
-                localTasks = localTasks.filter(t => t.id !== id);
-                localStorage.setItem('mock_tasks', JSON.stringify(localTasks));
-                fetchTasks();
-            }
-        }
-
-        // --- ĐIỀU HƯỚNG ---
         function showPage(pageId) {
             ['dashboard', 'employees', 'tasks'].forEach(p => {
                 document.getElementById('page-' + p).style.display = (p === pageId) ? 'block' : 'none';
